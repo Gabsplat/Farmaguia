@@ -19,6 +19,7 @@ interface ContextValue {
 
   // Mapa & geolocalización
   userPos: LatLng | null;
+  setUserPos(pos: LatLng | null): void;
   mapInstance: google.maps.Map | null;
   setMapInstance(map: google.maps.Map): void;
 }
@@ -85,6 +86,7 @@ export const PharmacyProvider = ({ children }: { children: React.ReactNode }) =>
         userPos,
         mapInstance,
         setMapInstance,
+        setUserPos
       }}
     >
       {children}
