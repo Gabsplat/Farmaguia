@@ -9,7 +9,7 @@ export default function TestLayout() {
 
   return (
     <div className="flex min-h-screen gap-10">
-      <div className="flex-1">
+      <div className="flex-1 w-full">
         <Outlet />
       </div>
       <div className="flex-1 flex items-center justify-center bg-blue-500">

@@ -13,7 +13,7 @@ createRoot(document.getElementById("root")!).render(
         <Routes>
           {/* <Route path="/" element={<MapLayout />} /> */}
           <Route element={<TestLayout />}>
-            <Route path="/" element={<h1>xD</h1>} />
+            <Route path="/" element={<MapLayout></MapLayout>} />
             <Route path="/hola" element={<h1>xD2</h1>} />
           </Route>
         </Routes>

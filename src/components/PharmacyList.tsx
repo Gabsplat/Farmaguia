@@ -116,7 +116,6 @@ const PharmacyList = () => {
                   <span className="text-sm md:text-base">{pharmacy.phone}</span>
                 </div>
               </div>
-
               <div className="mt-2 flex items-center justify-between">
                 <span
                   className={cn(
@@ -137,6 +136,11 @@ const PharmacyList = () => {
                   </span>
                 </div>
               </div>
+                {typeof pharmacy.distance === "number" && (
+              <div className="mt-2 text-sm text-gray-700">
+                ~{pharmacy.distance.toFixed(1)} km
+              </div>
+            )}
             </div>
           </div>
         ))}

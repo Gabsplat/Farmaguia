@@ -60,22 +60,14 @@ const MapLayout = () => {
       <div className="flex flex-col h-screen lg:flex-row">
         <div
           className={cn(
-            "w-full lg:w-1/2 overflow-auto bg-white transition-all duration-300",
+            "w-full overflow-auto bg-white transition-all duration-300",
             selected ? "h-full" : "h-[60vh] lg:h-full"
           )}
         >
           {selected ? <PharmacyDetail /> : <PharmacyList />}
         </div>
 
-        {/* Map panel */}
-        <div
-          className={cn(
-            "w-full lg:w-1/2 transition-all duration-300",
-            selected ? "h-0 lg:h-full" : "h-[40vh] lg:h-full"
-          )}
-        >
-          <div id="map" className="w-full h-full" />
-        </div>
+       
       </div>
 
       {/* Mobile FAB */}

@@ -1,3 +1,4 @@
+// src/types/index.ts
 export interface Pharmacy {
   id: number;
   name: string;
@@ -14,4 +15,9 @@ export interface Pharmacy {
   description: string;
   website: string;
   weeklyHours: string[];
+
+  /** Distancia al usuario en km (opcional) */
+  distance?: number;
 }
+
+export type LatLng = { lat: number; lng: number };

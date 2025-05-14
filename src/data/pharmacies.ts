@@ -1,5 +1,5 @@
-// Mock data for pharmacies with additional details
-export const pharmacies = [
+import type { Pharmacy } from "../types/index";
+export const pharmacies : Pharmacy[] = [
   {
     id: 1,
     name: "Farmacia del Plata 10",
@@ -25,6 +25,7 @@ export const pharmacies = [
       "Sábado: 9:00 - 18:00",
       "Domingo: 9:00 - 13:00",
     ],
+    distance: 1.2,
   },
   {
     id: 2,
@@ -137,7 +138,7 @@ export const pharmacies = [
   },
   {
     id: 6,
-    name: "Farmacia del Plata 1",
+    name: "Farmacia del Plata 11",
     address: "Av. España 995, 5500",
     phone: "0800-266-4220",
     hours: "9hs a 18hs",
