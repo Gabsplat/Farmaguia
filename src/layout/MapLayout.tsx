@@ -1,6 +1,4 @@
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { MapPin } from "lucide-react";
 import PharmacyDetail from "../components/PharmacyDetail";
 import PharmacyList from "../components/PharmacyList";
 import { usePharmacies } from "../context/PharmacyContext";
@@ -24,18 +22,6 @@ const MapLayout = () => {
        
       </div>
 
-      {/* Mobile FAB */}
-      {selected && (
-        <Button
-          className="lg:hidden fixed bottom-4 right-4 rounded-full w-12 h-12 shadow-lg bg-teal-600 hover:bg-teal-700 flex items-center justify-center"
-          onClick={() => {
-            const mapContainer = document.getElementById("map")?.parentElement;
-            if (mapContainer) mapContainer.classList.toggle("h-[100vh]");
-          }}
-        >
-          <MapPin className="h-5 w-5" />
-        </Button>
-      )}
     </main>
   );
 };

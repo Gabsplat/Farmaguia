@@ -13,7 +13,7 @@ export default function TestLayout() {
       <div className="flex-1 w-full">
         <Outlet />
       </div>
-      <div className="flex-1">
+      <div className="flex-1 w-full ">
         <MapView />
       </div>
     </div>
