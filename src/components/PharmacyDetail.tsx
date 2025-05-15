@@ -25,8 +25,15 @@ import {
 import { usePharmacies } from "../context/PharmacyContext";
 
 export default function PharmacyDetail() {
-  const { selected, backToList } = usePharmacies();
+  const { selected, backToList, userPos } = usePharmacies();
   if (!selected) return null;
+
+  const gmUrl = userPos
+    ? `https://www.google.com/maps/dir/?api=1` +
+      `&origin=${userPos.lat},${userPos.lng}` +
+      `&destination=${selected.lat},${selected.lng}` +
+      `&travelmode=driving`
+    : null;
 
   return (
     <div className="p-4 md:p-6">
@@ -51,17 +58,14 @@ export default function PharmacyDetail() {
             </div>
           </div>
 
-          <div className="flex items-center text-gray-700">
-            <ExternalLink className="h-5 w-5 mr-2" />
-            <a
-              href={selected.website}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline"
-            >
-              {selected.website}
-            </a>
-          </div>
+          {selected.website && (
+            <div className="flex items-center text-gray-700">
+              <ExternalLink className="h-5 w-5 mr-2" />
+              <a href={selected.website} target="_blank" rel="noopener noreferrer" className="underline">
+                {selected.website}
+              </a>
+            </div>
+          )}
 
           <div className="flex items-center space-x-2 flex-wrap">
             {selected.services.map((s) => (
@@ -107,13 +111,21 @@ export default function PharmacyDetail() {
               ))}
             </TabsContent>
           </Tabs>
+
+          {gmUrl && (
+            <div className="mt-4">
+              <Button asChild variant="outline">
+                <a href={gmUrl} target="_blank" rel="noopener noreferrer">
+                  Abrir en Google Maps
+                </a>
+              </Button>
+            </div>
+          )}
         </CardContent>
 
         <CardFooter className="flex justify-end">
-          <Button asChild>
-            <a href="#" onClick={backToList}>
-              Volver a lista
-            </a>
+          <Button variant="ghost" onClick={backToList}>
+            Volver a lista
           </Button>
         </CardFooter>
       </Card>

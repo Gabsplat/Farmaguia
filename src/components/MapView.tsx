@@ -1,9 +1,8 @@
 // src/components/MapView.tsx
-import  { useEffect } from "react";
-import { useJsApiLoader, GoogleMap, Marker } from "@react-google-maps/api";
+import React, { useEffect, useState } from "react";
+import { useJsApiLoader, GoogleMap, Marker, DirectionsRenderer } from "@react-google-maps/api";
 import { usePharmacies } from "../context/PharmacyContext";
 
-// Define container style
 const containerStyle = { width: "100%", height: "100%" };
 
 export default function MapView() {
@@ -16,32 +15,58 @@ export default function MapView() {
     selected,
   } = usePharmacies();
 
-  // Load Google Maps API
+const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
+
+
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_MAPS_API_KEY,
   });
 
-  // Get user location on mount
+  // 1) Geolocalización inicial
   useEffect(() => {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        setUserPos(coords);
-      },
+      (pos) => setUserPos({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
       (err) => console.warn("Geolocation error:", err.message)
     );
   }, [setUserPos]);
 
-  // Center map on selected pharmacy
+  // 2) Cuando cambia `selected`, calculamos la ruta
   useEffect(() => {
-    if (selected && mapInstance) {
-      mapInstance.panTo({ lat: selected.lat, lng: selected.lng });
-      mapInstance.setZoom(16);
-    }
-  }, [selected, mapInstance]);
+    if (!selected || !userPos || !mapInstance) return;
 
-  if (loadError) return <div>Error al cargar el mapa</div>;
+    const service = new window.google.maps.DirectionsService();
+    service.route(
+      {
+        origin: userPos,
+        destination: { lat: selected.lat, lng: selected.lng },
+        travelMode: google.maps.TravelMode.DRIVING,
+      },
+      (result, status) => {
+        if (status === "OK" && result) {
+          setDirections(result);
+        } else {
+          console.error("Error fetching directions", status);
+        }
+      }
+    );
+  }, [selected, userPos, mapInstance]);
+    useEffect(() => {
+    if (selected === null && mapInstance) {
+      // 1) Quita la ruta del renderer
+      setDirections(null);
+
+      // 2) Centra de nuevo en la posición inicial (o en el userPos)
+      const center = userPos ?? { lat: -32.889, lng: -68.844 };
+      mapInstance.panTo(center);
+
+      // 3) Restaura el zoom original
+      mapInstance.setZoom(14);
+    }
+  }, [selected, mapInstance, userPos]);
+
+
+  if (loadError) return <div>Error al cargar Google Maps</div>;
   if (!isLoaded) return <div>Cargando mapa…</div>;
 
   return (
@@ -52,20 +77,21 @@ export default function MapView() {
       options={{ disableDefaultUI: true, zoomControl: true }}
       onLoad={(map) => setMapInstance(map)}
     >
-      {/* User marker */}
+      {/* Marcador de usuario */}
       {userPos && (
         <Marker
           position={userPos}
           icon={{ url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" }}
         />
       )}
-      {/* Pharmacy markers */}
+
+      {/* Marcadores de farmacias */}
       {filtered.map((p) => (
         <Marker
           key={p.id}
           position={{ lat: p.lat, lng: p.lng }}
           onClick={() => {
-            // Delegated to context selectPharmacy if needed
+            // si quieres, puedes mover aquí selectPharmacy(p.id)
           }}
           icon={
             selected?.id === p.id
@@ -74,6 +100,9 @@ export default function MapView() {
           }
         />
       ))}
+
+      {/* 3) Si tenemos directions, dibujamos la ruta */}
+      {directions && <DirectionsRenderer directions={directions} />}
     </GoogleMap>
   );
 }

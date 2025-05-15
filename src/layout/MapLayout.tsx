@@ -7,53 +7,7 @@ import { usePharmacies } from "../context/PharmacyContext";
 
 const MapLayout = () => {
   const { selected, backToList, filtered, selectPharmacy } = usePharmacies();
-  //   const [markers, setMarkers] = useState<google.maps.Marker[]>([]);
-
-  /* init map */
-  //   useEffect(() => {
-  //     if (typeof window === "undefined") return;
-
-  //     const init = () => {
-  //       if (!window.google || map) return;
-  //       const instance = new window.google.maps.Map(
-  //         document.getElementById("map") as HTMLElement,
-  //         {
-  //           center: { lat: -32.889, lng: -68.844 },
-  //           zoom: 14,
-  //           mapId: "pharmacy-map",
-  //           disableDefaultUI: true,
-  //           zoomControl: true,
-  //         }
-  //       );
-  //       setMap(instance);
-  //     };
-
-  //     if (!window.google) {
-  //       const script = document.createElement("script");
-  //       script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap`;
-  //       script.async = true;
-  //       script.defer = true;
-  //       window.initMap = init;
-  //       document.head.appendChild(script);
-  //     } else init();
-  //   }, [map, setMap]);
-
-  /* update markers when filtered list changes */
-  //   useEffect(() => {
-  //     if (!map) return;
-  //     markers.forEach((m) => m.setMap(null));
-
-  //     const newM = filtered.map((p) => {
-  //       const m = new window.google.maps.Marker({
-  //         position: { lat: p.lat, lng: p.lng },
-  //         map,
-  //         title: p.name,
-  //       });
-  //       m.addListener("click", () => selectPharmacy(p.id));
-  //       return m;
-  //     });
-  //     setMarkers(newM);
-  //   }, [filtered, map]);
+  
 
   return (
     <main className="flex flex-col min-h-screen">
