@@ -16,7 +16,6 @@ export interface Pharmacy {
   website: string;
   weeklyHours: string[];
 
-  /** Distancia al usuario en km (opcional) */
   distance?: number;
 }
 

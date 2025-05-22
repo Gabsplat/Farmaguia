@@ -1,7 +1,6 @@
 // src/components/MobileHeader.tsx
-import React from "react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -10,12 +9,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Search } from "lucide-react";
+import React from "react";
 import { usePharmacies } from "../context/PharmacyContext";
 import { chains } from "../data/pharmacies";
 
 export default function MobileHeader() {
-  const { searchTerm, setSearchTerm, selectedChain, setSelectedChain } =
-    usePharmacies();
+  const {
+    searchTerm,
+    setSearchTerm,
+    selectedChain,
+    setSelectedChain,
+    mapInstance,
+  } = usePharmacies();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,10 +29,13 @@ export default function MobileHeader() {
 
   return (
     <div className="w-full bg-white p-3 shadow-md">
+      <h1 className="text-3xl md:text-4xl font-bold text-teal-600 mb-4 md:mb-6">
+        Farma guía
+      </h1>
       <form onSubmit={handleSearch} className="flex gap-2">
         <div className="relative flex-1">
           <Input
-            placeholder="Ingresar localidad"
+            placeholder="Buscar por farmacia"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-9"
@@ -37,10 +45,7 @@ export default function MobileHeader() {
         <Button type="submit" className="bg-teal-600 hover:bg-teal-700">
           Ir
         </Button>
-        <Select
-          value={selectedChain}
-          onValueChange={setSelectedChain}
-        >
+        {/* <Select value={selectedChain} onValueChange={setSelectedChain}>
           <SelectTrigger>
             <SelectValue placeholder="Cadena" />
           </SelectTrigger>
@@ -51,7 +56,7 @@ export default function MobileHeader() {
               </SelectItem>
             ))}
           </SelectContent>
-        </Select>
+        </Select> */}
       </form>
     </div>
   );

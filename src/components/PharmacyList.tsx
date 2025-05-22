@@ -9,9 +9,9 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { Clock, MapPin, Phone, Search, Star } from "lucide-react";
-import React from "react";
+import React, { useEffect } from "react";
 import { usePharmacies } from "../context/PharmacyContext";
-import { chains } from "../data/pharmacies";
+// import { chains } from "../data/pharmacies";
 
 const PharmacyList = () => {
   const {
@@ -23,6 +23,10 @@ const PharmacyList = () => {
     selectedChain,
     setSelectedChain,
   } = usePharmacies();
+
+  useEffect(() => {
+    console.log("filtered", filtered);
+  }, [filtered]);
 
   const handleSubmit = (e: React.FormEvent) => e.preventDefault();
 
@@ -45,7 +49,7 @@ const PharmacyList = () => {
                 <div className="relative flex-1">
                   <Input
                     type="text"
-                    placeholder="Ingresar una localidad"
+                    placeholder="Buscar por farmacia"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10 pr-4 py-2 w-full border rounded-md"
@@ -60,7 +64,7 @@ const PharmacyList = () => {
                 </Button>
               </div>
 
-              <div className="flex items-center gap-2">
+              {/* <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-500 uppercase font-medium">
                   Filtrar por
                 </span>
@@ -76,10 +80,21 @@ const PharmacyList = () => {
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
+              </div> */}
             </form>
           </div>
         </div>
+        {filtered === null && (
+          <div className="text-center text-gray-500">
+            No se encontraron farmacias
+          </div>
+        )}
+        {filtered !== null && filtered.length === 0 && (
+          <div className="text-center text-gray-500 animate-pulse">
+            Cargando farmacias...
+          </div>
+        )}
+
         {filtered.map((pharmacy) => (
           <div
             id={`pharmacy-${pharmacy.id}`}
@@ -136,11 +151,11 @@ const PharmacyList = () => {
                   </span>
                 </div>
               </div>
-                {typeof pharmacy.distance === "number" && (
-              <div className="mt-2 text-sm text-gray-700">
-                ~{pharmacy.distance.toFixed(1)} km
-              </div>
-            )}
+              {typeof pharmacy.distance === "number" && (
+                <div className="mt-2 text-sm text-gray-700">
+                  ~{pharmacy.distance.toFixed(1)} km
+                </div>
+              )}
             </div>
           </div>
         ))}

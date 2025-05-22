@@ -1,12 +1,12 @@
 // src/context/PharmacyContext.tsx
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { pharmacies as defaultPharmacies } from "../data/pharmacies";
-import type { Pharmacy, LatLng } from "../types";
+import type { LatLng, Pharmacy } from "../types";
 import { haversine } from "../utils/distance";
 
 interface ContextValue {
   // List & filter
-  filtered: Pharmacy[];          // siempre ordenado por distancia
+  filtered: Pharmacy[]; // siempre ordenado por distancia
   searchTerm: string;
   selectedChain: string;
   setSearchTerm(v: string): void;
@@ -26,11 +26,16 @@ interface ContextValue {
 
 const PharmacyContext = createContext<ContextValue | undefined>(undefined);
 
-export const PharmacyProvider = ({ children }: { children: React.ReactNode }) => {
+export const PharmacyProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   // Filtrado básico
+  const [pharmacies, setPharmacies] = useState<Pharmacy[] | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedChain, setSelectedChain] = useState("Todas");
-  const [filtered, setFiltered] = useState<Pharmacy[]>(defaultPharmacies);
+  const [filtered, setFiltered] = useState<Pharmacy[] | null>(null);
 
   // Selección
   const [selected, setSelected] = useState<Pharmacy | null>(null);
@@ -39,13 +44,29 @@ export const PharmacyProvider = ({ children }: { children: React.ReactNode }) =>
   const [userPos, setUserPos] = useState<LatLng | null>(null);
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
 
+  useEffect(() => {
+    const fetchedPharmacies = async () => {
+      const response = await fetch("/api/pdf/scrap-match?localidadId=9");
+      console.log(response);
+      const data = await response.json();
+      console.log(data);
+      setPharmacies(data);
+      setFiltered(data);
+    };
+    fetchedPharmacies();
+  }, []);
+
   // 1) Filtrar + añadir distancia + ordenar
   useEffect(() => {
-    let list = defaultPharmacies.filter((p) => {
+    if (!pharmacies) return;
+    let list = pharmacies?.filter((p) => {
       const st = searchTerm.toLowerCase();
       const matchesText =
-        !st || p.name.toLowerCase().includes(st) || p.address.toLowerCase().includes(st);
-      const matchesChain = selectedChain === "Todas" || p.name.includes(selectedChain);
+        !st ||
+        p.name.toLowerCase().includes(st) ||
+        p.address.toLowerCase().includes(st);
+      const matchesChain =
+        selectedChain === "Todas" || p.name.includes(selectedChain);
       return matchesText && matchesChain;
     });
 
@@ -54,7 +75,7 @@ export const PharmacyProvider = ({ children }: { children: React.ReactNode }) =>
         ...p,
         distance: haversine(userPos, { lat: p.lat, lng: p.lng }),
       }));
-      list.sort((a, b) => (a.distance! - b.distance!));
+      list.sort((a, b) => a.distance! - b.distance!);
     }
 
     setFiltered(list);
@@ -62,6 +83,7 @@ export const PharmacyProvider = ({ children }: { children: React.ReactNode }) =>
 
   // 2) Seleccionar farmacia + panTo en el mapa
   const selectPharmacy = (id: number) => {
+    if (!filtered) return;
     const ph = filtered.find((p) => p.id === id) || null;
     setSelected(ph);
     if (ph && mapInstance) {
@@ -75,7 +97,7 @@ export const PharmacyProvider = ({ children }: { children: React.ReactNode }) =>
   return (
     <PharmacyContext.Provider
       value={{
-        filtered,
+        filtered: filtered || [],
         searchTerm,
         selectedChain,
         setSearchTerm,
@@ -86,7 +108,7 @@ export const PharmacyProvider = ({ children }: { children: React.ReactNode }) =>
         userPos,
         mapInstance,
         setMapInstance,
-        setUserPos
+        setUserPos,
       }}
     >
       {children}
@@ -96,6 +118,7 @@ export const PharmacyProvider = ({ children }: { children: React.ReactNode }) =>
 
 export const usePharmacies = () => {
   const ctx = useContext(PharmacyContext);
-  if (!ctx) throw new Error("usePharmacies must be used within PharmacyProvider");
+  if (!ctx)
+    throw new Error("usePharmacies must be used within PharmacyProvider");
   return ctx;
 };

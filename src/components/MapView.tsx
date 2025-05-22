@@ -1,11 +1,13 @@
 // src/components/MapView.tsx
-import React, { useEffect, useState } from "react";
+import useMobile from "@/hooks/useMobile";
 import {
-  useJsApiLoader,
+  DirectionsRenderer,
   GoogleMap,
   Marker,
-  DirectionsRenderer,
+  useJsApiLoader,
 } from "@react-google-maps/api";
+import { useEffect, useState } from "react";
+import { Drawer } from "vaul";
 import { usePharmacies } from "../context/PharmacyContext";
 import PharmacyDetail from "./PharmacyDetail";
 
@@ -23,9 +25,8 @@ export default function MapView() {
     backToList,
   } = usePharmacies();
 
-  const [directions, setDirections] = useState<
-    google.maps.DirectionsResult | null
-  >(null);
+  const [directions, setDirections] =
+    useState<google.maps.DirectionsResult | null>(null);
 
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_MAPS_API_KEY,
@@ -47,11 +48,17 @@ export default function MapView() {
 
   // 1.b) Una vez que tenemos mapa y userPos, centramos allí
   useEffect(() => {
-    if (mapInstance && userPos) {
+    if (!mapInstance || !userPos) return;
+
+    if (filtered.length > 0) {
+      const first = filtered[0];
+      mapInstance.panTo({ lat: first.lat, lng: first.lng });
+      mapInstance.setZoom(14);
+    } else {
       mapInstance.panTo(userPos);
       mapInstance.setZoom(14);
     }
-  }, [mapInstance, userPos]);
+  }, [mapInstance, userPos, filtered]);
 
   // 2) Calcular ruta cuando seleccionan farmacia
   useEffect(() => {
@@ -82,15 +89,36 @@ export default function MapView() {
     }
   }, [selected, mapInstance, userPos]);
 
+  const isMobile = useMobile();
+
+  useEffect(() => {
+    console.log("selected", selected);
+    console.log("selected", !!selected, isMobile);
+  }, [selected]);
+
   if (loadError) return <div>Error al cargar Google Maps</div>;
   if (!isLoaded) return <div>Cargando mapa…</div>;
 
   return (
     <div className="relative h-full">
+      {/* Mobile Drawer */}{" "}
+      <Drawer.Root
+        open={!!selected && isMobile}
+        onOpenChange={() => backToList()}
+      >
+        <Drawer.Portal>
+          <Drawer.Content className="bg-white flex flex-col rounded-t-[10px] fixed bottom-0 left-0 right-0 outline-none z-50">
+            <div className="p-4 bg-white rounded-t-[10px] flex-1">
+              <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-gray-300 mb-8" />
+              <PharmacyDetail />
+            </div>
+          </Drawer.Content>
+        </Drawer.Portal>
+      </Drawer.Root>
       <GoogleMap
         mapContainerStyle={containerStyle}
-        // Ya no necesitas center aquí, lo manejamos por panTo
         zoom={14}
+        center={userPos || { lat: -12.0464, lng: -77.0428 }}
         options={{ disableDefaultUI: true, zoomControl: true }}
         onLoad={(map) => setMapInstance(map)}
       >
@@ -103,47 +131,24 @@ export default function MapView() {
           />
         )}
 
-        {filtered.map((p) => (
-          <Marker
-            key={p.id}
-            position={{ lat: p.lat, lng: p.lng }}
-            onClick={() => selectPharmacy(p.id)}
-            icon={
-              selected?.id === p.id
-                ? "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
-                : undefined
-            }
-          />
-        ))}
+        {filtered.map((p) => {
+          return (
+            <Marker
+              key={p.id}
+              position={{ lat: p.lat, lng: p.lng }}
+              onClick={() => selectPharmacy(p.id)}
+              icon={
+                selected?.id === p.id
+                  ? "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+                  : undefined
+              }
+            />
+          );
+        })}
 
         {directions && <DirectionsRenderer directions={directions} />}
       </GoogleMap>
-
       {/* Bottom-sheet mobile */}
-      {selected && (
-        <div
-          className="
-            md:hidden
-            absolute bottom-0 inset-x-0
-            max-h-1/2
-            bg-white
-            shadow-xl
-            rounded-t-xl
-            overflow-auto
-            z-30
-          "
-        >
-          <PharmacyDetail />
-          <div className="p-2 flex justify-end">
-            <button
-              className="text-sm text-gray-600"
-              onClick={backToList}
-            >
-              Cerrar
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

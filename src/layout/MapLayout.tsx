@@ -1,29 +1,28 @@
-// src/layouts/MapLayout.tsx
-import React from "react";
-import MobileHeader from "@/components/MobileHeader";
+// src/layouts/TestLayout.tsx
 import MapView from "@/components/MapView";
-import PharmacyList from "@/components/PharmacyList";
-import PharmacyDetail from "@/components/PharmacyDetail";
-import { usePharmacies } from "@/context/PharmacyContext";
+import MobileHeader from "@/components/MobileHeader";
+import { Outlet } from "react-router";
 
-export default function MapLayout() {
-  const { selected } = usePharmacies();
-
+export default function TestLayout() {
   return (
-    <div className="">
+    <div className="relative h-screen">
       {/* Mobile: header sobre el mapa */}
       <div className="absolute top-0 left-0 right-0 z-20 md:hidden">
         <MobileHeader />
       </div>
 
-      {/* Mapa full-screen */}     <div className="absolute inset-0 z-10 md:hidden">
+      {/* Mapa full-screen */}
+      <div className="absolute inset-0 z-10 md:hidden">
         <MapView />
       </div>
 
-      {/* Desktop: sidebar + mapa */}
+      {/* Desktop: split 50/50 */}
       <div className="hidden md:flex h-full">
-        <div className="w-full overflow-auto border-r">
-          {selected ? <PharmacyDetail /> : <PharmacyList />}
+        <div className="w-1/2 overflow-auto">
+          <Outlet />
+        </div>
+        <div className="w-1/2 overflow-hidden">
+          <MapView />
         </div>
       </div>
     </div>
