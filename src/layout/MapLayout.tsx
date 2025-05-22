@@ -1,29 +1,31 @@
-import { cn } from "@/lib/utils";
-import PharmacyDetail from "../components/PharmacyDetail";
-import PharmacyList from "../components/PharmacyList";
-import { usePharmacies } from "../context/PharmacyContext";
+// src/layouts/MapLayout.tsx
+import React from "react";
+import MobileHeader from "@/components/MobileHeader";
+import MapView from "@/components/MapView";
+import PharmacyList from "@/components/PharmacyList";
+import PharmacyDetail from "@/components/PharmacyDetail";
+import { usePharmacies } from "@/context/PharmacyContext";
 
-const MapLayout = () => {
-  const { selected, backToList, filtered, selectPharmacy } = usePharmacies();
-  
+export default function MapLayout() {
+  const { selected } = usePharmacies();
 
   return (
-    <main className="flex flex-col min-h-screen">
-      <div className="flex flex-col h-screen lg:flex-row">
-        <div
-          className={cn(
-            "w-full overflow-auto bg-white transition-all duration-300",
-            selected ? "h-full" : "h-[60vh] lg:h-full"
-          )}
-        >
-          {selected ? <PharmacyDetail /> : <PharmacyList />}
-        </div>
-
-       
+    <div className="">
+      {/* Mobile: header sobre el mapa */}
+      <div className="absolute top-0 left-0 right-0 z-20 md:hidden">
+        <MobileHeader />
       </div>
 
-    </main>
-  );
-};
+      {/* Mapa full-screen */}     <div className="absolute inset-0 z-10 md:hidden">
+        <MapView />
+      </div>
 
-export default MapLayout;
+      {/* Desktop: sidebar + mapa */}
+      <div className="hidden md:flex h-full">
+        <div className="w-full overflow-auto border-r">
+          {selected ? <PharmacyDetail /> : <PharmacyList />}
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,7 +1,13 @@
 // src/components/MapView.tsx
 import React, { useEffect, useState } from "react";
-import { useJsApiLoader, GoogleMap, Marker, DirectionsRenderer } from "@react-google-maps/api";
+import {
+  useJsApiLoader,
+  GoogleMap,
+  Marker,
+  DirectionsRenderer,
+} from "@react-google-maps/api";
 import { usePharmacies } from "../context/PharmacyContext";
+import PharmacyDetail from "./PharmacyDetail";
 
 const containerStyle = { width: "100%", height: "100%" };
 
@@ -13,28 +19,43 @@ export default function MapView() {
     setMapInstance,
     filtered,
     selected,
+    selectPharmacy,
+    backToList,
   } = usePharmacies();
 
-const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
-
+  const [directions, setDirections] = useState<
+    google.maps.DirectionsResult | null
+  >(null);
 
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_MAPS_API_KEY,
   });
 
-  // 1) Geolocalización inicial
+  // 1) Geolocalización inicial con alta precisión
   useEffect(() => {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
-      (pos) => setUserPos({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-      (err) => console.warn("Geolocation error:", err.message)
+      (pos) =>
+        setUserPos({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        }),
+      (err) => console.warn("Geolocation error:", err.message),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
   }, [setUserPos]);
 
-  // 2) Cuando cambia `selected`, calculamos la ruta
+  // 1.b) Una vez que tenemos mapa y userPos, centramos allí
+  useEffect(() => {
+    if (mapInstance && userPos) {
+      mapInstance.panTo(userPos);
+      mapInstance.setZoom(14);
+    }
+  }, [mapInstance, userPos]);
+
+  // 2) Calcular ruta cuando seleccionan farmacia
   useEffect(() => {
     if (!selected || !userPos || !mapInstance) return;
-
     const service = new window.google.maps.DirectionsService();
     service.route(
       {
@@ -43,66 +64,86 @@ const [directions, setDirections] = useState<google.maps.DirectionsResult | null
         travelMode: google.maps.TravelMode.DRIVING,
       },
       (result, status) => {
-        if (status === "OK" && result) {
-          setDirections(result);
-        } else {
-          console.error("Error fetching directions", status);
-        }
+        if (status === "OK" && result) setDirections(result);
+        else console.error("Error fetching directions", status);
       }
     );
   }, [selected, userPos, mapInstance]);
-    useEffect(() => {
+
+  // 3) Reset cuando des-seleccionan farmacia
+  useEffect(() => {
     if (selected === null && mapInstance) {
-      // 1) Quita la ruta del renderer
       setDirections(null);
-
-      // 2) Centra de nuevo en la posición inicial (o en el userPos)
-      const center = userPos ?? { lat: -32.889, lng: -68.844 };
-      mapInstance.panTo(center);
-
-      // 3) Restaura el zoom original
-      mapInstance.setZoom(14);
+      // opcional: re-centrar en userPos
+      if (userPos) {
+        mapInstance.panTo(userPos);
+        mapInstance.setZoom(14);
+      }
     }
   }, [selected, mapInstance, userPos]);
-
 
   if (loadError) return <div>Error al cargar Google Maps</div>;
   if (!isLoaded) return <div>Cargando mapa…</div>;
 
   return (
-    <GoogleMap
-      mapContainerStyle={containerStyle}
-      center={userPos ?? { lat: -32.889, lng: -68.844 }}
-      zoom={14}
-      options={{ disableDefaultUI: true, zoomControl: true }}
-      onLoad={(map) => setMapInstance(map)}
-    >
-      {/* Marcador de usuario */}
-      {userPos && (
-        <Marker
-          position={userPos}
-          icon={{ url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" }}
-        />
+    <div className="relative h-full">
+      <GoogleMap
+        mapContainerStyle={containerStyle}
+        // Ya no necesitas center aquí, lo manejamos por panTo
+        zoom={14}
+        options={{ disableDefaultUI: true, zoomControl: true }}
+        onLoad={(map) => setMapInstance(map)}
+      >
+        {userPos && (
+          <Marker
+            position={userPos}
+            icon={{
+              url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+            }}
+          />
+        )}
+
+        {filtered.map((p) => (
+          <Marker
+            key={p.id}
+            position={{ lat: p.lat, lng: p.lng }}
+            onClick={() => selectPharmacy(p.id)}
+            icon={
+              selected?.id === p.id
+                ? "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+                : undefined
+            }
+          />
+        ))}
+
+        {directions && <DirectionsRenderer directions={directions} />}
+      </GoogleMap>
+
+      {/* Bottom-sheet mobile */}
+      {selected && (
+        <div
+          className="
+            md:hidden
+            absolute bottom-0 inset-x-0
+            max-h-1/2
+            bg-white
+            shadow-xl
+            rounded-t-xl
+            overflow-auto
+            z-30
+          "
+        >
+          <PharmacyDetail />
+          <div className="p-2 flex justify-end">
+            <button
+              className="text-sm text-gray-600"
+              onClick={backToList}
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
       )}
-
-      {/* Marcadores de farmacias */}
-      {filtered.map((p) => (
-        <Marker
-          key={p.id}
-          position={{ lat: p.lat, lng: p.lng }}
-          onClick={() => {
-            // si quieres, puedes mover aquí selectPharmacy(p.id)
-          }}
-          icon={
-            selected?.id === p.id
-              ? "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
-              : undefined
-          }
-        />
-      ))}
-
-      {/* 3) Si tenemos directions, dibujamos la ruta */}
-      {directions && <DirectionsRenderer directions={directions} />}
-    </GoogleMap>
+    </div>
   );
 }

@@ -1,20 +1,30 @@
-import { APIProvider, Map } from "@vis.gl/react-google-maps";
-import { useEffect } from "react";
+// src/layouts/TestLayout.tsx
+import React from "react";
+import MobileHeader from "@/components/MobileHeader";
+import MapView from "@/components/MapView";
 import { Outlet } from "react-router";
-import MapView from "../components/MapView";
 
 export default function TestLayout() {
-  useEffect(() => {
-    console.log("MAPS_API_KEY", import.meta.env.VITE_MAPS_API_KEY);
-  }, []);
-
   return (
-    <div className="flex min-h-screen gap-10">
-      <div className="flex-1 w-full">
-        <Outlet />
+    <div className="relative h-screen">
+      {/* Mobile: header sobre el mapa */}
+      <div className="absolute top-0 left-0 right-0 z-20 md:hidden">
+        <MobileHeader />
       </div>
-      <div className="flex-1 w-full ">
+
+      {/* Mapa full-screen */}
+      <div className="absolute inset-0 z-10 md:hidden">
         <MapView />
+      </div>
+
+      {/* Desktop: split 50/50 */}
+      <div className="hidden md:flex h-full">
+        <div className="w-1/2 overflow-auto">
+          <Outlet />
+        </div>
+        <div className="w-1/2 overflow-hidden">
+          <MapView />
+        </div>
       </div>
     </div>
   );
