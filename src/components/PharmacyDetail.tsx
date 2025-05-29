@@ -92,7 +92,7 @@ export default function PharmacyDetail() {
               className="border-teal-600 hover:bg-teal-600 hover:text-white text-teal-600 mt-2 sm:mt-0"
             >
               <a
-                href={`https://wa.me/${selected.telefono}?text=¡Hola! Tengo una urgencia.`}
+                href={`tel:${selected.telefono}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
