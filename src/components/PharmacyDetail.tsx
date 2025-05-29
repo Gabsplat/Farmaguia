@@ -14,6 +14,7 @@ import {
   ArrowLeft,
   Calendar,
   Clock,
+  CornerUpLeft,
   ExternalLink,
   Info,
   MapPin,
@@ -38,14 +39,19 @@ export default function PharmacyDetail() {
 
   return (
     <div className="md:p-6">
-      <Button variant="ghost" size="sm" onClick={backToList} className="mb-4">
-        <ArrowLeft className="h-4 w-4 mr-1" /> Volver
-      </Button>
-
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl text-teal-600 flex items-center">
-            <MapPin className="mr-2 h-6 w-6" /> {selected.nombre}
+          <CardTitle className="text-2xl text-teal-600 flex justify-between items-center">
+            <span className="flex items-center">
+              <MapPin className="mr-2 h-6 w-6" /> {selected.nombre}
+            </span>
+            <Button
+              variant="ghost"
+              className="rounded-full h-16 w-16 flex items-center justify-center"
+              onClick={backToList}
+            >
+              <CornerUpLeft className="h-8 w-8" />
+            </Button>
           </CardTitle>
         </CardHeader>
 

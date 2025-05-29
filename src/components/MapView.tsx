@@ -52,7 +52,11 @@ export default function MapView() {
 
     if (filtered.length > 0) {
       const first = filtered[0];
-      mapInstance.panTo({ lat: first.latitud, lng: first.longitud });
+      console.log("first", first);
+      mapInstance.panTo({
+        lat: Number(first.latitud),
+        lng: Number(first.longitud),
+      });
       mapInstance.setZoom(14);
     } else {
       mapInstance.panTo(userPos);
@@ -68,8 +72,8 @@ export default function MapView() {
       {
         origin: userPos,
         destination: {
-          lat: selected.latitud,
-          lng: selected.longitud,
+          lat: Number(selected.latitud),
+          lng: Number(selected.longitud),
         },
         travelMode: google.maps.TravelMode.DRIVING,
       },
@@ -129,20 +133,21 @@ export default function MapView() {
           />
         )}
 
-        {/* {filtered.map((p) => {
-          return (
-            <Marker
-              key={p.id}
-              position={{ lat: p.latitud, lng: p.longitud }}
-              onClick={() => selectPharmacy(p.id)}
-              icon={
-                selected?.id === p.id
-                  ? "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
-                  : undefined
-              }
-            />
-          );
-        })} */}
+        {filtered &&
+          filtered.map((p) => {
+            return (
+              <Marker
+                key={p.id}
+                position={{ lat: Number(p.latitud), lng: Number(p.longitud) }}
+                onClick={() => selectPharmacy(p.id)}
+                icon={
+                  selected?.id === p.id
+                    ? "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+                    : undefined
+                }
+              />
+            );
+          })}
 
         {directions && <DirectionsRenderer directions={directions} />}
       </GoogleMap>
