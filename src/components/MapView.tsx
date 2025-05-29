@@ -127,24 +127,41 @@ export default function MapView() {
         {userPos && (
           <Marker
             position={userPos}
+            label={{
+              text: "Tu posición",
+              className:
+                "block bg-white! px-2! py-1! text-xs! rounded-full! border-2! border-blue-500! font-medium! text-blue-700! ",
+            }}
             icon={{
-              url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+              url: "/home.png",
+              labelOrigin: new google.maps.Point(11, -20),
             }}
           />
         )}
 
         {filtered &&
-          filtered.map((p) => {
+          filtered.map((p, i) => {
             return (
               <Marker
                 key={p.id}
                 position={{ lat: Number(p.latitud), lng: Number(p.longitud) }}
                 onClick={() => selectPharmacy(p.id)}
-                icon={
-                  selected?.id === p.id
-                    ? "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+                label={
+                  i === 0
+                    ? {
+                        text: "MÁS CERCANO",
+                        className:
+                          "block bg-white! px-2! py-1! text-xs! rounded-full! border-2! border-teal-800! font-bold! text-teal-900! animate-pulse! duration-[50]! ",
+                      }
                     : undefined
                 }
+                icon={{
+                  url:
+                    selected?.id === p.id
+                      ? "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+                      : "/pharmacy_pin.png",
+                  labelOrigin: new google.maps.Point(15, -20),
+                }}
               />
             );
           })}

@@ -77,9 +77,9 @@ export const PharmacyProvider = ({
       }));
       list.sort((a, b) => a.distance! - b.distance!);
     }
-
+    console.log("list", list);
     setFiltered(list);
-  }, [searchTerm, selectedChain, userPos]);
+  }, [searchTerm, selectedChain, userPos, pharmacies]);
 
   // 2) Seleccionar farmacia + panTo en el mapa
   const selectPharmacy = (id: number) => {

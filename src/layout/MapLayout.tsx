@@ -22,7 +22,7 @@ export default function TestLayout() {
       {/* Desktop: split 50/50 */}
       {!isMobile && (
         <div className="hidden md:flex h-full">
-          <div className="absolute h-screen left-4 top-4 rounded-xl min-h-screen w-1/3 z-50 overflow-y-scroll no-scrollbar">
+          <div className="absolute h-screen rounded-r-xl min-h-screen w-1/2 xl:w-1/3 2xl:w-1/4 z-50 overflow-y-scroll no-scrollbar">
             <Outlet />
           </div>
           <div className="w-full overflow-hidden">

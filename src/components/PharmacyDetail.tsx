@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { cn } from "@/lib/utils";
+import { capitalizeWords, cn } from "@/lib/utils";
 import {
   ArrowLeft,
   Calendar,
@@ -21,6 +21,7 @@ import {
   MessageCircle,
   Navigation,
   Phone,
+  PhoneCall,
   Star,
 } from "lucide-react";
 import React from "react";
@@ -41,21 +42,21 @@ export default function PharmacyDetail() {
     <div className="md:p-6">
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl text-teal-600 flex justify-between items-center">
+          <CardTitle className="text-3xl font-bold text-teal-600 flex justify-between items-center">
             <span className="flex items-center">
-              <MapPin className="mr-2 h-6 w-6" /> {selected.nombre}
+              <MapPin className="mr-2 h-6 w-6" />{" "}
+              {capitalizeWords(selected.nombre)}
             </span>
-            <Button
-              variant="ghost"
-              className="rounded-full h-16 w-16 flex items-center justify-center"
+            <button
+              className="cursor-pointer rounded-full h-10 w-10 flex items-center justify-center"
               onClick={backToList}
             >
               <CornerUpLeft className="h-8 w-8" />
-            </Button>
+            </button>
           </CardTitle>
         </CardHeader>
 
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 -mt-2">
           <div className="flex items-center text-yellow-500">
             <Star className="h-5 w-5 mr-1" />
             <span className="font-medium">{selected.review}</span>
@@ -78,13 +79,26 @@ export default function PharmacyDetail() {
             </div>
           )}
 
-          <div className="flex flex-col gap-4 md:flex-row">
+          <div className="flex flex-wrap flex-col gap-4 md:flex-row">
             {/* <div className="flex items-center text-gray-700">
               <Clock className="h-5 w-5 mr-2" /> {selected.hours}
             </div> */}
             <div className="flex items-center text-gray-700 mt-2 sm:mt-0">
               <Phone className="h-5 w-5 mr-2" /> {selected.telefono}
             </div>
+            <Button
+              asChild
+              variant="outline"
+              className="border-teal-600 hover:bg-teal-600 hover:text-white text-teal-600 mt-2 sm:mt-0"
+            >
+              <a
+                href={`https://wa.me/${selected.telefono}?text=¡Hola! Tengo una urgencia.`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <PhoneCall className="h-4 w-4" /> ¡Llamar ahora!
+              </a>
+            </Button>
             <Button
               asChild
               variant="outline"
@@ -115,6 +129,9 @@ export default function PharmacyDetail() {
           </div> */}
 
           <div className="my-8 text-gray-700">
+            <h2 className="text-lg font-semibold text-gray-400 mb-2">
+              HORARIOS
+            </h2>
             <div className="flex items-center ">
               <Navigation className="h-4 w-4 mr-2 rotate-45" />{" "}
               <b className="mr-1">Lunes</b>
@@ -172,7 +189,7 @@ export default function PharmacyDetail() {
           </Tabs> */}
 
           {gmUrl && (
-            <div className="mt-4">
+            <div className="flex justify-end mt-4">
               <Button asChild variant="outline">
                 <a href={gmUrl} target="_blank" rel="noopener noreferrer">
                   Abrir en Google Maps

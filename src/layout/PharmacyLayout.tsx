@@ -7,7 +7,7 @@ export default function MapLayout() {
   const { selected } = usePharmacies();
 
   return (
-    <div className="hidden md:flex *:w-full h-fit">
+    <div className="hidden md:flex *:w-full h-fit min-h-screen">
       {selected ? <PharmacyDetail /> : <PharmacyList />}
     </div>
   );
