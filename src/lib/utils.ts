@@ -12,3 +12,7 @@ export function capitalizeWords(str: string) {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 }
+
+export function formatPhoneNumber(phoneNumber: string) {
+  return phoneNumber.replace(/\s+/g, "").replace(/-/g, "");
+}

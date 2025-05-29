@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { capitalizeWords, cn } from "@/lib/utils";
+import { capitalizeWords, cn, formatPhoneNumber } from "@/lib/utils";
 import {
   ArrowLeft,
   Calendar,
@@ -105,7 +105,9 @@ export default function PharmacyDetail() {
               className="border-teal-600 hover:bg-teal-600 hover:text-white text-teal-600 mt-2 sm:mt-0"
             >
               <a
-                href={`https://wa.me/${selected.telefono}?text=¡Hola! Tengo una urgencia.`}
+                href={`https://wa.me/${formatPhoneNumber(
+                  selected.telefono
+                )}?text=¡Hola! Tengo una urgencia.`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
