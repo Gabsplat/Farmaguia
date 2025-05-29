@@ -1,21 +1,26 @@
 // src/types/index.ts
 export interface Pharmacy {
   id: number;
-  name: string;
-  address: string;
-  phone: string;
-  hours: string;
-  isOpen: boolean;
-  lat: number;
-  lng: number;
-  rating: number;
-  reviews: number;
-  services: string[];
-  paymentMethods: string[];
-  description: string;
-  website: string;
-  weeklyHours: string[];
-
+  localidad_id: number;
+  franquicia_id: number;
+  nombre: string;
+  nombre_pdf: string;
+  direccion: string;
+  telefono: string;
+  latitud: number;
+  longitud: number;
+  review: number;
+  comentarios: number;
+  siempre_abierta: boolean;
+  sitio_web: string | null;
+  lunes: string;
+  martes: string;
+  miercoles: string;
+  jueves: string;
+  viernes: string;
+  sabado: string;
+  domingo: string;
+  url: string;
   distance?: number;
 }
 

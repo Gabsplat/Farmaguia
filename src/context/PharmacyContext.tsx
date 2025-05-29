@@ -46,10 +46,10 @@ export const PharmacyProvider = ({
 
   useEffect(() => {
     const fetchedPharmacies = async () => {
-      const response = await fetch("/api/pdf/scrap-match?localidadId=9");
-      console.log(response);
+      const response = await fetch(
+        "https://farma-guia-back.vercel.app/api/farmacias/abiertas"
+      );
       const data = await response.json();
-      console.log(data);
       setPharmacies(data);
       setFiltered(data);
     };
@@ -63,17 +63,17 @@ export const PharmacyProvider = ({
       const st = searchTerm.toLowerCase();
       const matchesText =
         !st ||
-        p.name.toLowerCase().includes(st) ||
-        p.address.toLowerCase().includes(st);
+        p.nombre.toLowerCase().includes(st) ||
+        p.direccion.toLowerCase().includes(st);
       const matchesChain =
-        selectedChain === "Todas" || p.name.includes(selectedChain);
+        selectedChain === "Todas" || p.nombre.includes(selectedChain);
       return matchesText && matchesChain;
     });
 
     if (userPos) {
       list = list.map((p) => ({
         ...p,
-        distance: haversine(userPos, { lat: p.lat, lng: p.lng }),
+        distance: haversine(userPos, { lat: p.latitud, lng: p.longitud }),
       }));
       list.sort((a, b) => a.distance! - b.distance!);
     }
@@ -87,7 +87,7 @@ export const PharmacyProvider = ({
     const ph = filtered.find((p) => p.id === id) || null;
     setSelected(ph);
     if (ph && mapInstance) {
-      mapInstance.panTo({ lat: ph.lat, lng: ph.lng });
+      mapInstance.panTo({ lat: ph.latitud, lng: ph.longitud });
       mapInstance.setZoom(16);
     }
   };

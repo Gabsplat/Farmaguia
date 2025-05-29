@@ -52,7 +52,7 @@ export default function MapView() {
 
     if (filtered.length > 0) {
       const first = filtered[0];
-      mapInstance.panTo({ lat: first.lat, lng: first.lng });
+      mapInstance.panTo({ lat: first.latitud, lng: first.longitud });
       mapInstance.setZoom(14);
     } else {
       mapInstance.panTo(userPos);
@@ -67,7 +67,10 @@ export default function MapView() {
     service.route(
       {
         origin: userPos,
-        destination: { lat: selected.lat, lng: selected.lng },
+        destination: {
+          lat: selected.latitud,
+          lng: selected.longitud,
+        },
         travelMode: google.maps.TravelMode.DRIVING,
       },
       (result, status) => {
@@ -90,11 +93,6 @@ export default function MapView() {
   }, [selected, mapInstance, userPos]);
 
   const isMobile = useMobile();
-
-  useEffect(() => {
-    console.log("selected", selected);
-    console.log("selected", !!selected, isMobile);
-  }, [selected]);
 
   if (loadError) return <div>Error al cargar Google Maps</div>;
   if (!isLoaded) return <div>Cargando mapa…</div>;
@@ -131,11 +129,11 @@ export default function MapView() {
           />
         )}
 
-        {filtered.map((p) => {
+        {/* {filtered.map((p) => {
           return (
             <Marker
               key={p.id}
-              position={{ lat: p.lat, lng: p.lng }}
+              position={{ lat: p.latitud, lng: p.longitud }}
               onClick={() => selectPharmacy(p.id)}
               icon={
                 selected?.id === p.id
@@ -144,7 +142,7 @@ export default function MapView() {
               }
             />
           );
-        })}
+        })} */}
 
         {directions && <DirectionsRenderer directions={directions} />}
       </GoogleMap>

@@ -28,10 +28,8 @@ export default function MobileHeader() {
   };
 
   return (
-    <div className="w-full bg-white p-3 shadow-md">
-      <h1 className="text-3xl md:text-4xl font-bold text-teal-600 mb-4 md:mb-6">
-        Farma guía
-      </h1>
+    <div className="m-auto w-[95vw] bg-white p-6 shadow-md mt-4 rounded-lg">
+      <img src="/logo.svg" alt="Farma guía" className="h-16 mb-4" />
       <form onSubmit={handleSearch} className="flex gap-2">
         <div className="relative flex-1">
           <Input
