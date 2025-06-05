@@ -129,7 +129,11 @@ export default function MapView() {
         mapContainerStyle={containerStyle}
         zoom={14}
         center={userPos || { lat: -12.0464, lng: -77.0428 }}
-        options={{ disableDefaultUI: true, zoomControl: true }}
+        options={{
+          disableDefaultUI: true,
+          zoomControl: true,
+          gestureHandling: "greedy",
+        }}
         onLoad={(map) => setMapInstance(map)}
       >
         {userPos && (
