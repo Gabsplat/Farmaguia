@@ -13,6 +13,8 @@ import PharmacyDetail from "./PharmacyDetail";
 
 const containerStyle = { width: "100%", height: "100%" };
 
+const snapPoints = ["200px", "400px", 1];
+
 export default function MapView() {
   const {
     userPos,
@@ -24,6 +26,8 @@ export default function MapView() {
     selectPharmacy,
     backToList,
   } = usePharmacies();
+
+  const [snap, setSnap] = useState<number | string | null>(snapPoints[0]);
 
   const [directions, setDirections] =
     useState<google.maps.DirectionsResult | null>(null);
@@ -105,6 +109,10 @@ export default function MapView() {
     <div className="relative h-full">
       {/* Mobile Drawer */}{" "}
       <Drawer.Root
+        snapPoints={snapPoints}
+        activeSnapPoint={snap}
+        modal={false}
+        setActiveSnapPoint={setSnap}
         open={!!selected && isMobile}
         onOpenChange={() => backToList()}
       >
