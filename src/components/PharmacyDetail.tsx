@@ -42,7 +42,7 @@ export default function PharmacyDetail() {
     <div className="md:p-6">
       <Card>
         <CardHeader>
-          <CardTitle className="text-3xl font-bold text-teal-600 flex justify-between items-center">
+          <CardTitle className="text-2xl sm:text-3xl font-bold text-teal-600 flex justify-between items-center">
             <span className="flex items-center">
               <MapPin className="mr-2 h-6 w-6" />{" "}
               {capitalizeWords(selected.nombre)}
@@ -79,7 +79,7 @@ export default function PharmacyDetail() {
             </div>
           )}
 
-          <div className="flex flex-wrap flex-col gap-4 md:flex-row">
+          <div className="flex flex-wrap gap-2 sm:gap-4 flex-row">
             {/* <div className="flex items-center text-gray-700">
               <Clock className="h-5 w-5 mr-2" /> {selected.hours}
             </div> */}
@@ -102,7 +102,7 @@ export default function PharmacyDetail() {
             <Button
               asChild
               variant="outline"
-              className="border-teal-600 hover:bg-teal-600 hover:text-white text-teal-600 mt-2 sm:mt-0"
+              className="border-teal-600 hover:bg-teal-600 hover:text-white text-teal-600 "
             >
               <a
                 href={`https://wa.me/${formatPhoneNumber(
@@ -130,7 +130,7 @@ export default function PharmacyDetail() {
             ))}
           </div> */}
 
-          <div className="my-8 text-gray-700">
+          <div className="my-5 sm:my-8 text-gray-700">
             <h2 className="text-lg font-semibold text-gray-400 mb-2">
               HORARIOS
             </h2>

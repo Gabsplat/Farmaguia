@@ -158,7 +158,7 @@ export default function MapView() {
                 icon={{
                   url:
                     selected?.id === p.id
-                      ? "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+                      ? "/pharmacy_pin_target.png"
                       : "/pharmacy_pin.png",
                   labelOrigin: new google.maps.Point(15, -20),
                 }}
@@ -166,7 +166,28 @@ export default function MapView() {
             );
           })}
 
-        {directions && <DirectionsRenderer directions={directions} />}
+        {directions && (
+          <DirectionsRenderer
+            directions={directions}
+            options={{
+              polylineOptions: {
+                strokeColor: "#084639",
+                strokeWeight: 5,
+                icons: [
+                  {
+                    icon: {
+                      path: google.maps.SymbolPath.CIRCLE,
+                      scale: 5,
+                      fillColor: "#084639",
+                    },
+                  },
+                ],
+              },
+              routeIndex: 0,
+              suppressMarkers: true,
+            }}
+          />
+        )}
       </GoogleMap>
       {/* Bottom-sheet mobile */}
     </div>
