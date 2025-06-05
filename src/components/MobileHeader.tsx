@@ -11,16 +11,9 @@ import {
 import { Search } from "lucide-react";
 import React from "react";
 import { usePharmacies } from "../context/PharmacyContext";
-import { chains } from "../data/pharmacies";
 
 export default function MobileHeader() {
-  const {
-    searchTerm,
-    setSearchTerm,
-    selectedChain,
-    setSelectedChain,
-    mapInstance,
-  } = usePharmacies();
+  const { searchTerm, setSearchTerm } = usePharmacies();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,8 +21,8 @@ export default function MobileHeader() {
   };
 
   return (
-    <div className="flex flex-col m-auto w-[95vw] bg-white p-6 shadow-md mt-4 rounded-lg">
-      <img src="/logo.svg" alt="Farma guía" className="h-16 mb-4" />
+    <div className="flex flex-col bg-white p-6 shadow-md rounded-b-lg">
+      <img src="/logo.svg" alt="Farma guía" className="h-12 mb-4" />
       <form onSubmit={handleSearch} className="flex gap-2">
         <div className="relative flex-1">
           <Input

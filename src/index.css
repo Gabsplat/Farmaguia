@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+body {
+  pointer-events: all !important;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

@@ -13,7 +13,7 @@ import PharmacyDetail from "./PharmacyDetail";
 
 const containerStyle = { width: "100%", height: "100%" };
 
-const snapPoints = ["200px", "400px", 1];
+const snapPoints = ["200px", 1];
 
 export default function MapView() {
   const {
@@ -112,6 +112,7 @@ export default function MapView() {
         snapPoints={snapPoints}
         activeSnapPoint={snap}
         modal={false}
+        autoFocus={false}
         setActiveSnapPoint={setSnap}
         open={!!selected && isMobile}
         onOpenChange={() => backToList()}
