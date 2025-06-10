@@ -1,23 +1,18 @@
-// src/context/PharmacyContext.tsx
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { pharmacies as defaultPharmacies } from "../data/pharmacies";
 import type { LatLng, Pharmacy } from "../types";
 import { haversine } from "../utils/distance";
 
 interface ContextValue {
-  // List & filter
-  filtered: Pharmacy[]; // siempre ordenado por distancia
+  filtered: Pharmacy[];
   searchTerm: string;
   selectedChain: string;
   setSearchTerm(v: string): void;
   setSelectedChain(v: string): void;
 
-  // Selección de detalle
   selected: Pharmacy | null;
   selectPharmacy(id: number): void;
   backToList(): void;
 
-  // Mapa & geolocalización
   userPos: LatLng | null;
   setUserPos(pos: LatLng | null): void;
   mapInstance: google.maps.Map | null;
@@ -31,32 +26,37 @@ export const PharmacyProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  // Filtrado básico
   const [pharmacies, setPharmacies] = useState<Pharmacy[] | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedChain, setSelectedChain] = useState("Todas");
   const [filtered, setFiltered] = useState<Pharmacy[] | null>(null);
 
-  // Selección
   const [selected, setSelected] = useState<Pharmacy | null>(null);
 
-  // Geolocalización & mapa
   const [userPos, setUserPos] = useState<LatLng | null>(null);
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
 
   useEffect(() => {
     const fetchedPharmacies = async () => {
+      const cached = localStorage.getItem("pharmacies");
+      if (cached) {
+        const data = JSON.parse(cached);
+        setPharmacies(data);
+        setFiltered(data);
+        return;
+      }
+
       const response = await fetch(
         "https://farma-guia-back.vercel.app/api/farmacias/abiertas"
       );
       const data = await response.json();
       setPharmacies(data);
       setFiltered(data);
+      localStorage.setItem("pharmacies", JSON.stringify(data));
     };
     fetchedPharmacies();
   }, []);
 
-  // 1) Filtrar + añadir distancia + ordenar
   useEffect(() => {
     if (!pharmacies) return;
     let list = pharmacies?.filter((p) => {
@@ -81,7 +81,6 @@ export const PharmacyProvider = ({
     setFiltered(list);
   }, [searchTerm, selectedChain, userPos, pharmacies]);
 
-  // 2) Seleccionar farmacia + panTo en el mapa
   const selectPharmacy = (id: number) => {
     if (!filtered) return;
     const ph = filtered.find((p) => p.id === id) || null;

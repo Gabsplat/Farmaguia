@@ -1,4 +1,3 @@
-// src/layouts/MapLayout.tsx
 import PharmacyDetail from "@/components/PharmacyDetail";
 import PharmacyList from "@/components/PharmacyList";
 import { usePharmacies } from "@/context/PharmacyContext";

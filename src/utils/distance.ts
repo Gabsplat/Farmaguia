@@ -1,14 +1,8 @@
-// src/utils/distance.ts
-
 import type { LatLng } from "../types/index";
 
-/**
- * Calcula la distancia en kilómetros entre dos coordenadas
- * usando la fórmula de Haversine.
- */
 export function haversine(a: LatLng, b: LatLng): number {
   const toRad = (x: number) => (x * Math.PI) / 180;
-  const R = 6371; // Radio de la Tierra en km
+  const R = 6371;
 
   const dLat = toRad(b.lat - a.lat);
   const dLng = toRad(b.lng - a.lng);

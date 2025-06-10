@@ -7,7 +7,10 @@ body {
 
 @custom-variant dark (&:is(.dark *));
 
+
 @theme inline {
+  --color-primary: #188670;
+  --color-primary-foreground: #0e6755;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -113,6 +116,11 @@ body {
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
+@theme {
+  --color-farmaguia: #188670;
+  --color-farmaguia-foreground: #0e6755;
+}
+
 
 @layer base {
   * {

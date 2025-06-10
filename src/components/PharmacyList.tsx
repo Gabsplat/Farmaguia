@@ -1,164 +1,122 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import {
-  Clock,
-  MapPin,
-  MessageCircle,
-  Phone,
-  PhoneCall,
-  Search,
-  Star,
-} from "lucide-react";
-import { useMemo } from "react";
+import { MapPin, Search, Cross } from "lucide-react";
 import { usePharmacies } from "../context/PharmacyContext";
-// import { chains } from "../data/pharmacies";
+
+const ITEMS_PER_PAGE = 6;
 
 const PharmacyList = () => {
-  const {
-    filtered,
-    selected,
-    selectPharmacy,
-    searchTerm,
-    setSearchTerm,
-    selectedChain,
-    setSelectedChain,
-  } = usePharmacies();
+  const { filtered, selected, selectPharmacy, searchTerm, setSearchTerm } =
+    usePharmacies();
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
 
-  const handleSubmit = (e: React.FormEvent) => e.preventDefault();
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSearchTerm(searchTerm.trim());
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => prev + ITEMS_PER_PAGE);
   };
 
+  const visiblePharmacies = filtered?.slice(0, visibleCount) || [];
+  const hasMore = filtered && filtered.length > visibleCount;
+
   return (
-    <div className="p-4 md:px-8 md:pb-6 md:pt-4 bg-white no-scrollbar">
-      <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
-        <div className="sticky top-0 bg-white py-6 z-50">
-          <img src="/logo.svg" alt="Farma guía" className="h-14 mb-4" />
-
-          <form onSubmit={handleSearch} className="space-y-3 md:space-y-4">
-            <div className="flex flex-col sm:flex-row gap-2">
-              <div className="relative flex-1">
-                <Input
-                  type="text"
-                  placeholder="Buscar por farmacia"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 w-full"
-                />
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+    <div className="flex flex-col h-full mt-6 ml-6 rounded-xl">
+      <Card className="p-4 mb-4 flex flex-row justify-center bg-white border-b rounded-xl border-gray-100">
+        <img src="/logo.svg" alt="Farmaguía" className="w-[60%]" />
+        <div className="py-2 flex justify-center w-full">
+          <div className="flex w-full justify-center max-w-sm items-center gap-2">
+            <Input
+              type="text"
+              placeholder="Buscá por farmacia"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <div className="flex-shrink-0">
+              <div className="w-10 h-10 bg-farmaguia/10 rounded-full flex items-center justify-center">
+                <Search className="w-6 h-6 text-farmaguia rotate-0" />
               </div>
             </div>
-
-            {/* <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-500 uppercase font-medium">
-                  Filtrar por
-                </span>
-                <Select value={selectedChain} onValueChange={setSelectedChain}>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Cadena" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {chains.map((chain) => (
-                      <SelectItem key={chain} value={chain}>
-                        {chain}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div> */}
-          </form>
+          </div>
         </div>
+      </Card>
+
+      <div className="flex-1 overflow-y-auto">
         {filtered === null && (
-          <div className="text-center text-gray-500">
-            No se encontraron farmacias
+          <div className="text-center text-gray-500 py-8">
+            <MapPin className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+            <p>No se encontraron farmacias</p>
           </div>
         )}
+
         {filtered !== null && filtered.length === 0 && (
-          <div className="text-center text-gray-500 animate-pulse">
-            Cargando farmacias...
+          <div className="text-center text-gray-500 animate-pulse py-8">
+            <div className="w-8 h-8 bg-gray-200 rounded-full mx-auto mb-3 animate-pulse"></div>
+            <p>Cargando farmacias...</p>
           </div>
         )}
 
-        {filtered &&
-          filtered.map((pharmacy) => (
-            <div
-              id={`pharmacy-${pharmacy.id}`}
-              key={pharmacy.id}
-              className={cn(
-                "border rounded-lg overflow-hidden transition-all duration-200 hover:shadow-md cursor-pointer",
-                selected?.id === pharmacy.id ? "ring-2 ring-teal-500" : "",
-                "border-l-4 border-l-green-500"
-              )}
-              onClick={() => selectPharmacy(pharmacy.id)}
-            >
-              <div className="relative p-3 md:p-4">
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2">
-                  <h3 className="text-base md:text-lg font-semibold">
-                    {pharmacy.nombre}
-                  </h3>
-                </div>
-                <a
-                  href={`tel:${pharmacy.telefono}`}
-                  target="_blank"
-                  className="absolute top-3 right-2 flex items-center gap-2 border px-2 py-1 rounded-full border-teal-600 hover:bg-teal-600 hover:text-white text-teal-600 mt-2 sm:mt-0"
-                  rel="noopener noreferrer"
-                >
-                  <PhoneCall className="h-4 w-4" /> ¡Llamar ahora!
-                </a>
-
-                <div className="space-y-1 text-gray-600">
-                  <div className="flex items-center">
-                    <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
-                    <span className="text-sm md:text-base">
-                      {pharmacy.direccion}
-                    </span>
-                  </div>
-                  <div className="flex items-center">
-                    <Phone className="h-4 w-4 mr-2 flex-shrink-0" />
-                    <span className="text-sm md:text-base">
-                      {pharmacy.telefono}
-                    </span>
-                  </div>
-                </div>
-                <div className="mt-2 flex items-center justify-between">
-                  <span
-                    className={cn(
-                      "text-xs font-medium px-2 py-1 rounded-full",
-                      "bg-green-100 text-green-800"
-                    )}
-                  >
-                    Abierto
-                  </span>
-
-                  <div className="flex items-center">
-                    <Star className="h-4 w-4 text-yellow-400 mr-1" />
-                    <span className="text-sm font-medium">
-                      {pharmacy.review}
-                    </span>
-                    <span className="text-xs text-gray-500 ml-1">
-                      ({pharmacy.comentarios})
-                    </span>
-                  </div>
-                </div>
-                {typeof pharmacy.distance === "number" && (
-                  <div className="mt-2 text-sm text-gray-700">
-                    ~{pharmacy.distance.toFixed(1)} km
-                  </div>
+        {visiblePharmacies.length > 0 && (
+          <div className="space-y-3">
+            {visiblePharmacies.map((pharmacy) => (
+              <Card
+                key={pharmacy.id}
+                className={cn(
+                  "p-4 cursor-pointer transition-all duration-200 hover:shadow-md border-l-4 border-l-farmaguia",
+                  selected?.id === pharmacy.id
+                    ? "ring-2 ring-farmaguia shadow-md"
+                    : "shadow-sm"
                 )}
+                onClick={() => selectPharmacy(pharmacy.id)}
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="flex-shrink-0">
+                    <div className="w-10 h-10 bg-farmaguia rounded-full flex items-center justify-center">
+                      <Cross className="w-6 h-6 text-white rotate-0" />
+                    </div>
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between mb-1">
+                      <h3 className="font-semibold text-gray-900 text-base truncate pr-2">
+                        {pharmacy.nombre}
+                      </h3>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Abierto
+                      </span>
+                    </div>
+
+                    <div className="flex items-center text-gray-600 mb-2">
+                      <MapPin className="h-3 w-3 mr-1 flex-shrink-0 text-gray-400" />
+                      {typeof pharmacy.distance === "number" && (
+                        <span className="text-xs text-gray-500 mr-3">
+                          {(pharmacy.distance / 0.6).toFixed(0)} min
+                        </span>
+                      )}
+                      <span className="text-xs truncate">
+                        {pharmacy.direccion}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))}
+
+            {hasMore && (
+              <div className="pt-4 pb-2">
+                <Button
+                  variant="outline"
+                  className="w-full border-gray-200 hover:bg-gray-50 text-gray-700"
+                  onClick={handleLoadMore}
+                >
+                  Cargar más farmacias ({filtered.length - visibleCount}{" "}
+                  restantes)
+                </Button>
               </div>
-            </div>
-          ))}
-      </form>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -1,4 +1,3 @@
-// src/components/MapView.tsx
 import useMobile from "@/hooks/useMobile";
 import {
   DirectionsRenderer,
@@ -13,7 +12,100 @@ import PharmacyDetail from "./PharmacyDetail";
 
 const containerStyle = { width: "100%", height: "100%" };
 
-const snapPoints = ["200px", 1];
+const snapPoints = ["150px", 1];
+
+const mapOptions: google.maps.MapOptions = {
+  disableDefaultUI: true,
+  zoomControl: true,
+  gestureHandling: "greedy",
+  // Oculta todos los POIs menos hospitales (siempre muestra hospitales)
+  styles: [
+    {
+      featureType: "poi.business",
+      elementType: "all",
+      stylers: [{ visibility: "off" }],
+    },
+    {
+      featureType: "poi.attraction",
+      elementType: "all",
+      stylers: [{ visibility: "off" }],
+    },
+    {
+      featureType: "poi.government",
+      elementType: "all",
+      stylers: [{ visibility: "off" }],
+    },
+    {
+      featureType: "poi.place_of_worship",
+      elementType: "all",
+      stylers: [{ visibility: "off" }],
+    },
+    {
+      featureType: "poi.school",
+      elementType: "all",
+      stylers: [{ visibility: "off" }],
+    },
+    {
+      featureType: "poi.sports_complex",
+      elementType: "all",
+      stylers: [{ visibility: "off" }],
+    },
+    // Ya no ocultamos parques aquí
+    // Oculta todos los POIs excepto hospitales y parques
+    {
+      featureType: "poi",
+      elementType: "all",
+      stylers: [{ visibility: "off" }],
+    },
+    // Muestra hospitales (medical)
+    {
+      featureType: "poi.medical",
+      elementType: "all",
+      stylers: [{ visibility: "on" }],
+    },
+    {
+      featureType: "poi.medical",
+      elementType: "geometry",
+      stylers: [{ visibility: "on" }],
+    },
+    {
+      featureType: "poi.medical",
+      elementType: "labels",
+      stylers: [{ visibility: "on" }],
+    },
+    {
+      featureType: "poi.medical",
+      elementType: "labels.text",
+      stylers: [{ visibility: "on" }],
+    },
+    {
+      featureType: "poi.medical",
+      elementType: "labels.icon",
+      stylers: [{ visibility: "on" }],
+    },
+    // Vuelve a mostrar parques pero oculta sus íconos
+    {
+      featureType: "poi.park",
+      elementType: "all",
+      stylers: [{ visibility: "on" }],
+    },
+    {
+      featureType: "poi.park",
+      elementType: "geometry",
+      stylers: [{ visibility: "on" }],
+    },
+    {
+      featureType: "poi.park",
+      elementType: "labels",
+      stylers: [{ visibility: "on" }],
+    },
+    {
+      featureType: "poi.park",
+      elementType: "labels.icon",
+      stylers: [{ visibility: "off" }],
+    },
+  ],
+};
 
 export default function MapView() {
   const {
@@ -36,7 +128,6 @@ export default function MapView() {
     googleMapsApiKey: import.meta.env.VITE_MAPS_API_KEY,
   });
 
-  // 1) Geolocalización inicial con alta precisión
   useEffect(() => {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
@@ -50,7 +141,6 @@ export default function MapView() {
     );
   }, [setUserPos]);
 
-  // 1.b) Una vez que tenemos mapa y userPos, centramos allí
   useEffect(() => {
     if (!mapInstance || !userPos) return;
 
@@ -68,7 +158,6 @@ export default function MapView() {
     }
   }, [mapInstance, userPos, filtered]);
 
-  // 2) Calcular ruta cuando seleccionan farmacia
   useEffect(() => {
     if (!selected || !userPos || !mapInstance) return;
     const service = new window.google.maps.DirectionsService();
@@ -88,11 +177,10 @@ export default function MapView() {
     );
   }, [selected, userPos, mapInstance]);
 
-  // 3) Reset cuando des-seleccionan farmacia
   useEffect(() => {
     if (selected === null && mapInstance) {
       setDirections(null);
-      // opcional: re-centrar en userPos
+
       if (userPos) {
         mapInstance.panTo(userPos);
         mapInstance.setZoom(14);
@@ -120,7 +208,7 @@ export default function MapView() {
         <Drawer.Portal>
           <Drawer.Content className="bg-white flex flex-col rounded-t-[10px] fixed bottom-0 left-0 right-0 outline-none z-50">
             <div className="p-4 bg-white rounded-t-[10px] flex-1">
-              <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-gray-300 mb-8" />
+              <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-gray-300 mb-2" />
               <PharmacyDetail />
             </div>
           </Drawer.Content>
@@ -130,23 +218,19 @@ export default function MapView() {
         mapContainerStyle={containerStyle}
         zoom={14}
         center={userPos || { lat: -12.0464, lng: -77.0428 }}
-        options={{
-          disableDefaultUI: true,
-          zoomControl: true,
-          gestureHandling: "greedy",
-        }}
+        options={mapOptions}
         onLoad={(map) => setMapInstance(map)}
       >
         {userPos && (
           <Marker
             position={userPos}
             label={{
-              text: "Tu posición",
+              text: "Estás aquí",
               className:
-                "block bg-white! px-2! py-1! text-xs! rounded-full! border-2! border-blue-500! font-medium! text-blue-700! ",
+                "block bg-white! px-2! py-1! text-xs! rounded-full! border-2! border-[#FF7070]! font-medium! text-[#FF7070]! ",
             }}
             icon={{
-              url: "/home.png",
+              url: "/start.png",
               labelOrigin: new google.maps.Point(11, -20),
             }}
           />
@@ -162,17 +246,17 @@ export default function MapView() {
                 label={
                   i === 0
                     ? {
-                        text: "MÁS CERCANO",
+                        text: "Más cercana",
                         className:
-                          "block bg-white! px-2! py-1! text-xs! rounded-full! border-2! border-teal-800! font-bold! text-teal-900! animate-pulse! duration-[50]! ",
+                          "block bg-white! px-2! py-1! text-xs! rounded-full! border-2! border-farmaguia! font-bold! text-farmaguia! animate-pulse! duration-1000! ",
                       }
                     : undefined
                 }
                 icon={{
                   url:
                     selected?.id === p.id
-                      ? "/pharmacy_pin_target.png"
-                      : "/pharmacy_pin.png",
+                      ? "/selected-farmacia.png"
+                      : "/unselected-farmacia.png",
                   labelOrigin: new google.maps.Point(15, -20),
                 }}
               />
