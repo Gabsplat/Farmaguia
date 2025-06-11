@@ -39,20 +39,34 @@ export const PharmacyProvider = ({
   useEffect(() => {
     const fetchedPharmacies = async () => {
       const cached = localStorage.getItem("pharmacies");
+      const cacheDurationMs = 3 * 60 * 60 * 1000; // 3 horas
+      let useCache = false;
+
       if (cached) {
-        const data = JSON.parse(cached);
-        setPharmacies(data);
-        setFiltered(data);
-        return;
+        try {
+          const { data, timestamp } = JSON.parse(cached);
+          if (Date.now() - timestamp < cacheDurationMs) {
+            setPharmacies(data);
+            setFiltered(data);
+            useCache = true;
+          }
+        } catch {
+          // Si falla el parseo, ignora el cache
+        }
       }
 
-      const response = await fetch(
-        "https://farma-guia-back.vercel.app/api/farmacias/abiertas"
-      );
-      const data = await response.json();
-      setPharmacies(data);
-      setFiltered(data);
-      localStorage.setItem("pharmacies", JSON.stringify(data));
+      if (!useCache) {
+        const response = await fetch(
+          "https://farma-guia-back.vercel.app/api/farmacias/abiertas"
+        );
+        const data = await response.json();
+        setPharmacies(data);
+        setFiltered(data);
+        localStorage.setItem(
+          "pharmacies",
+          JSON.stringify({ data, timestamp: Date.now() })
+        );
+      }
     };
     fetchedPharmacies();
   }, []);
